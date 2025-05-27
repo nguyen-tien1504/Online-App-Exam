@@ -86,11 +86,11 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
                 findUser = new User(cursor.getString(0));
             }
         }else {
-            cursor = db.query(TABLE_USER, new String[]{COLUMN_USER_ID,COLUMN_USER_EMAIL},
+            cursor = db.query(TABLE_USER, new String[]{COLUMN_USER_FIRSTNAME,COLUMN_USER_LASTNAME,COLUMN_USER_ID,COLUMN_USER_EMAIL},
                     COLUMN_USER_EMAIL+"=? and "+COLUMN_USER_PASSWORD+"=?",
                     new String[]{String.valueOf(user.getEmail()),encodedPassword},null,null,null);
             if( cursor.moveToFirst()) {
-                findUser = new User(cursor.getInt(0), cursor.getString(1));
+                findUser = new User(cursor.getString(0),cursor.getString(1),cursor.getInt(2), cursor.getString(3));
             }
         }
         if(cursor.getCount() == 0) return null;

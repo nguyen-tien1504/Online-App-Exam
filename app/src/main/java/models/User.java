@@ -18,20 +18,16 @@ public class User {
         Password = password;
     }
 
-    public User(String email, String password) {
-        Email = email;
-        Password = password;
-    }
-
-    public User(String firstName, String lastName, String email) {
+    public User( String firstName, String lastName,int id, String email) {
+        Id = id;
         FirstName = firstName;
         LastName = lastName;
         Email = email;
     }
 
-    public User(int id, String email) {
-        Id = id;
+    public User(String email, String password) {
         Email = email;
+        Password = password;
     }
 
     public String getFirstName() {

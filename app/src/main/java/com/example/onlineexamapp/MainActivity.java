@@ -22,15 +22,14 @@ public class MainActivity extends AppCompatActivity {
     // creating constant keys for shared preferences.
     public static final String SHARED_PREFS = "shared_prefs";
 
-    // key for storing email.
+    // key for storing
     public static final String EMAIL_KEY = "email_key";
-
-    // key for storing password.
-    public static final String PASSWORD_KEY = "password_key";
+    public static final String FIRSTNAME_KEY = "firstname_key";
+    public static final String LASTNAME_KEY = "lastname_key";
 
     // variable for shared preferences.
     SharedPreferences sharedpreferences;
-    String emailShare, passwordShare;
+    String emailShare, firstNameShare, lastNameShare;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,18 +45,13 @@ public class MainActivity extends AppCompatActivity {
         TextView errMsg = findViewById(R.id.err_message);
         UserDatabaseHelper db =new UserDatabaseHelper(this);
 
-//        signUp.setOnClickListener(view -> {
-//            Intent myIntent = new Intent(MainActivity.this, SignUp.class);
-//            startActivity(myIntent);
-//            finish();
-//        });
-
         sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         emailShare = sharedpreferences.getString(EMAIL_KEY, null);
-        passwordShare = sharedpreferences.getString(PASSWORD_KEY, null);
+        firstNameShare = sharedpreferences.getString(EMAIL_KEY, null);
+        lastNameShare = sharedpreferences.getString(EMAIL_KEY, null);
 
         // check if the fields are not null then one current user is loggedIn
-        if (email != null && password != null) {
+        if (emailShare != null) {
             Intent i = new Intent(MainActivity.this, Home.class);
             startActivity(i);
             finish();
@@ -76,10 +70,9 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 SharedPreferences.Editor editor = sharedpreferences.edit();
 
-                // below two lines will put values for
-                // email and password in shared preferences.
                 editor.putString(EMAIL_KEY, findUser.getEmail());
-                editor.putString(PASSWORD_KEY, findUser.getPassword());
+                editor.putString(FIRSTNAME_KEY, findUser.getFirstName());
+                editor.putString(LASTNAME_KEY, findUser.getLastName());
 
                 // to save our data with key and value.
                 editor.apply();

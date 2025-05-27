@@ -1,7 +1,9 @@
 package com.example.onlineexamapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,16 +18,32 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class Home extends AppCompatActivity {
+    // creating constant keys for shared preferences.
+    public static final String SHARED_PREFS = "shared_prefs";
+
+    public static final String EMAIL_KEY = "email_key";
+    public static final String FIRSTNAME_KEY = "firstname_key";
+    public static final String LASTNAME_KEY = "lastname_key";
+    // variable for shared preferences.
+    SharedPreferences sharedpreferences;
+    String emailShare, firstNameShare, lastNameShare;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
+        // initializing our shared preferences.
+        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
-        Bundle b = getIntent().getExtras();
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        emailShare = sharedpreferences.getString(EMAIL_KEY, null);
+        firstNameShare = sharedpreferences.getString(FIRSTNAME_KEY, null);
+        lastNameShare = sharedpreferences.getString(LASTNAME_KEY, null);
 
         TextView name = findViewById(R.id.name);
+        name.setText(firstNameShare + " " + lastNameShare);
         TextView total_questions = findViewById(R.id.total_questions);
         TextView total_points = findViewById(R.id.total_points);
         Button startQuiz = findViewById(R.id.startQuiz);
@@ -36,6 +54,15 @@ public class Home extends AppCompatActivity {
         EditText start_quiz_id = findViewById(R.id.start_quiz_id);
         ImageView signout = findViewById(R.id.signout);
 
+        signout.setOnClickListener(v -> {
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            Intent i = new Intent(Home.this, MainActivity.class);
+            startActivity(i);
+            finish();
+        });
         createQuiz.setOnClickListener(v -> {
             if (quiz_title.getText().toString().equals("")) {
                 quiz_title.setError("Quiz title cannot be empty");
