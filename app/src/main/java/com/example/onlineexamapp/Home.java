@@ -17,6 +17,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import models.User;
+import models.UserDatabaseHelper;
+
 public class Home extends AppCompatActivity {
     // creating constant keys for shared preferences.
     public static final String SHARED_PREFS = "shared_prefs";
@@ -30,6 +33,7 @@ public class Home extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        UserDatabaseHelper userDB = new UserDatabaseHelper(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
@@ -42,10 +46,16 @@ public class Home extends AppCompatActivity {
         firstNameShare = sharedpreferences.getString(FIRSTNAME_KEY, null);
         lastNameShare = sharedpreferences.getString(LASTNAME_KEY, null);
 
+        User userTotalPointsAndQuestions = userDB.getTotalQuestionsAndPointsFromEmail(emailShare);
+
         TextView name = findViewById(R.id.name);
         name.setText(firstNameShare + " " + lastNameShare);
         TextView total_questions = findViewById(R.id.total_questions);
+        total_questions.setText(userTotalPointsAndQuestions.getTotalPoints());
+
         TextView total_points = findViewById(R.id.total_points);
+        total_points.setText(userTotalPointsAndQuestions.getTotalPoints());
+
         Button startQuiz = findViewById(R.id.startQuiz);
         Button createQuiz = findViewById(R.id.createQuiz);
         RelativeLayout solvedQuizzes = findViewById(R.id.solvedQuizzes);

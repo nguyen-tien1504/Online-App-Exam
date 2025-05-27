@@ -23,6 +23,8 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_USER_LASTNAME = "User_Lastname";
     private static final String COLUMN_USER_EMAIL = "User_Email";
     private static final String COLUMN_USER_PASSWORD = "User_Password";
+    private static final String COLUMN_USER_TOTAL_QUESTIONS = "User_Total_Questions";
+    private static final String COLUMN_USER_TOTAL_POINTS = "User_Total_Points";
 
 
     public UserDatabaseHelper(Context context) {
@@ -36,7 +38,9 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_USER_FIRSTNAME + " TEXT,"
                 + COLUMN_USER_LASTNAME + " TEXT,"
                 + COLUMN_USER_EMAIL + " TEXT,"
-                + COLUMN_USER_PASSWORD + " TEXT" +")";
+                + COLUMN_USER_PASSWORD + " TEXT,"
+                + COLUMN_USER_TOTAL_QUESTIONS + " INTEGER DEFAULT 0,"
+                + COLUMN_USER_TOTAL_POINTS + " INTEGER DEFAULT 0" +")";
         db.execSQL(script);
     }
 
@@ -98,4 +102,13 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         return findUser;
     }
 
+    public User getTotalQuestionsAndPointsFromEmail(String email){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select User_Total_Questions, User_Total_Points from User where User_Email=?",
+                new String[]{email});
+        cursor.moveToFirst();
+        User userFind = new User(cursor.getInt(0),cursor.getInt(1));
+        cursor.close();
+        return userFind;
+    }
 }
