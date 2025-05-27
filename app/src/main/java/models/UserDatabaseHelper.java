@@ -111,4 +111,10 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return userFind;
     }
+
+    public void updateUserTotalPointsAndQuestions(String email, int points, int questions){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Update User Set User_Total_Questions = User_Total_Questions +?, User_Total_Points = User_Total_Points +? where email =?",
+                new String[]{String.valueOf(questions), String.valueOf(points),email});
+    }
 }
