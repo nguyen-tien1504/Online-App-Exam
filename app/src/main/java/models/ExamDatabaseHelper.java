@@ -105,6 +105,25 @@ public class ExamDatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<Question> getQuestionFromExamTitle(String examTitle){
         SQLiteDatabase db = this.getReadableDatabase();
+        int examId = getIdExamOnTitle(examTitle);
+        Cursor cursor = db.rawQuery("Select * from Quizzes where COLUMN_EXAM_ID_FOREIGN = ?",
+                new String[]{String.valueOf(examId)});
+        ArrayList<Question> dataList = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                // Extract data from the current row
+                String question = cursor.getString(2);
+                String option1 = cursor.getString(3);
+                String option2 = cursor.getString(4);
+                String option3 = cursor.getString(5);
+                String option4 = cursor.getString(6);
+                int ans = Integer.parseInt(cursor.getString(7));
 
+                // Create a new object and add it to the list
+                Question item = new Question(question,option1,option2,option3,option4,ans);
+                dataList.add(item);
+            } while (cursor.moveToNext());
+        }
+        return dataList;
     }
 }

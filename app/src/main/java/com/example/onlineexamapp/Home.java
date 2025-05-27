@@ -53,7 +53,7 @@ public class Home extends AppCompatActivity {
                 return;
             }
             Intent i = new Intent(Home.this, Exam.class);
-            i.putExtra("Quiz ID", start_quiz_id.getText().toString());
+            i.putExtra("Quiz Title", start_quiz_id.getText().toString());
             start_quiz_id.setText("");
             startActivity(i);
         });

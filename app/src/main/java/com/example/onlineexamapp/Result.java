@@ -12,23 +12,35 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import models.Question;
 
 public class Result extends AppCompatActivity {
 
-    private Question[] data;
-    private String quizID;
+    private ArrayList<Question> data;
+    private String quizTitle;
+    private String points;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
-        quizID = getIntent().getStringExtra("Quiz ID");
+        quizTitle = getIntent().getStringExtra("Quiz Title");
+        points = getIntent().getStringExtra("Quiz points");
+        data = (ArrayList<Question>)getIntent().getSerializableExtra("Data");
 
         TextView title = findViewById(R.id.title);
+        title.setText(quizTitle);
         ListView listview = findViewById(R.id.listview);
         TextView total = findViewById(R.id.total);
+        TextView pointsView = findViewById(R.id.points);
+
+        int totalAnswerChecked = (int)data.stream().filter(question -> question.getSelectedAnswer()!=0).count();
+        total.setText("Total " + totalAnswerChecked + "/" + data.size());
+        pointsView.setText("Points: " + points);
     }
 
     public class ListAdapter extends BaseAdapter {
@@ -66,13 +78,13 @@ public class Result extends AppCompatActivity {
             RadioButton option4 = v.findViewById(R.id.option4);
             TextView result = v.findViewById(R.id.result);
 
-            question.setText(data[i].getQuestion());
-            option1.setText(data[i].getOption1());
-            option2.setText(data[i].getOption2());
-            option3.setText(data[i].getOption3());
-            option4.setText(data[i].getOption4());
+            question.setText(data.get(i).getQuestion());
+            option1.setText(data.get(i).getOption1());
+            option2.setText(data.get(i).getOption2());
+            option3.setText(data.get(i).getOption3());
+            option4.setText(data.get(i).getOption4());
 
-            switch (data[i].getSelectedAnswer()) {
+            switch (data.get(i).getSelectedAnswer()) {
                 case 1:
                     option1.setChecked(true);
                     break;
@@ -94,7 +106,7 @@ public class Result extends AppCompatActivity {
 
             result.setVisibility(View.VISIBLE);
 
-            if (data[i].getSelectedAnswer()==data[i].getCorrectAnswer()) {
+            if (data.get(i).getSelectedAnswer()==data.get(i).getCorrectAnswer()) {
                 result.setBackgroundResource(R.drawable.green_background);
                 result.setTextColor(ContextCompat.getColor(Result.this, R.color.green_dark));
                 result.setText("Correct Answer");
@@ -103,7 +115,7 @@ public class Result extends AppCompatActivity {
                 result.setTextColor(ContextCompat.getColor(Result.this, R.color.red_dark));
                 result.setText("Wrong Answer");
 
-                switch (data[i].getCorrectAnswer()) {
+                switch (data.get(i).getCorrectAnswer()) {
                     case 1:
                         option1.setBackgroundResource(R.drawable.green_background);
                         break;

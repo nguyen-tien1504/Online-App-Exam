@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:paddingVertical="10dp"
             android:gravity="center"
+            android:orientation="vertical"
             android:layout_alignParentBottom="true">
             <TextView
                 android:id="@+id/total"
@@ -40,6 +41,16 @@
                 android:gravity="center"
                 android:textColor="@color/main"
                 android:text="Total 20/20"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/points"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="25dp"
+                android:padding="5dp"
+                android:gravity="center"
+                android:textColor="@color/main"
+                android:text="Points"
                 android:textStyle="bold"/>
         </LinearLayout>
         <ListView

@@ -14,25 +14,36 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
+import models.ExamDatabaseHelper;
 import models.Question;
 
 public class Exam extends AppCompatActivity {
-    private Question[] data;
-    private String quizID;
-    private int oldTotalPoints = 0;
-    private int oldTotalQuestions = 0;
+    private ArrayList<Question> data;
+    private String quizTitle;
+//    private int oldTotalPoints = 0;
+//    private int oldTotalQuestions = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ExamDatabaseHelper examDB = new ExamDatabaseHelper(this);
         super.onCreate(savedInstanceState);
-        quizID = getIntent().getStringExtra("Quiz ID");
+        quizTitle = getIntent().getStringExtra("Quiz Title");
         ListView listview = findViewById(R.id.listview);
         Button submit = findViewById(R.id.submit);
         TextView title = findViewById(R.id.title);
         setContentView(R.layout.activity_exam);
+        title.setText(quizTitle);
 
+        data = examDB.getQuestionFromExamTitle(quizTitle);
         submit.setOnClickListener(v->{
+            int points = (int) data.stream().filter(question -> question.getSelectedAnswer() == question.getCorrectAnswer()).count();
             Intent i = new Intent(Exam.this, Result.class);
-            i.putExtra("Quiz ID", quizID);
+            Bundle bundle = new Bundle();
+            i.putExtra("Quiz Title", quizTitle);
+            i.putExtra("Quiz points", points);
+            i.putExtra("Data",(Serializable) data);
             startActivity(i);
             finish();
         });
@@ -69,38 +80,38 @@ public class Exam extends AppCompatActivity {
             RadioButton option3 = v.findViewById(R.id.option3);
             RadioButton option4 = v.findViewById(R.id.option4);
 
-            question.setText(data[i].getQuestion());
-            option1.setText(data[i].getOption1());
-            option2.setText(data[i].getOption2());
-            option3.setText(data[i].getOption3());
-            option4.setText(data[i].getOption4());
+            question.setText(data.get(i).getQuestion());
+            option1.setText(data.get(i).getOption1());
+            option2.setText(data.get(i).getOption2());
+            option3.setText(data.get(i).getOption3());
+            option4.setText(data.get(i).getOption4());
 
             option1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked) data[i].setSelectedAnswer(1);
+                    if(isChecked) data.get(i).setSelectedAnswer(1);
                 }
             });
             option2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked) data[i].setSelectedAnswer(2);
+                    if(isChecked) data.get(i).setSelectedAnswer(2);
                 }
             });
             option3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked) data[i].setSelectedAnswer(3);
+                    if(isChecked) data.get(i).setSelectedAnswer(3);
                 }
             });
             option4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked) data[i].setSelectedAnswer(4);
+                    if(isChecked) data.get(i).setSelectedAnswer(4);
                 }
             });
 
-            switch (data[i].getSelectedAnswer()){
+            switch (data.get(i).getSelectedAnswer()){
                 case 1:
                     option1.setChecked(true);
                     break;
