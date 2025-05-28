@@ -169,7 +169,6 @@ public class ExamEditor extends AppCompatActivity {
         @Override
         public CustomAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.question_edit,parent,false);
-
             return new ViewHolder(view);
         }
 

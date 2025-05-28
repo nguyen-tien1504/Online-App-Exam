@@ -14,7 +14,7 @@ import java.util.Base64;
 public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLite";
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "Online Exam App";
+    private static final String DATABASE_NAME = "User.db";
 
     // Table name: User.
     private static final String TABLE_USER = "User";
@@ -35,7 +35,6 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     public UserDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         String userScript = "CREATE TABLE " + TABLE_USER + "("
@@ -116,7 +115,7 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("Select SUM(User_Total_Points) from User_Result where User_id= (Select User_id from User where User_Email=?)",
                 new String[]{email});
-        cursor.moveToFirst();
+        if (!cursor.moveToFirst()) return 0;
         int userTotalPoints = cursor.getInt(0);
         cursor.close();
         return userTotalPoints;
@@ -124,7 +123,8 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
 
     public void addUserPointAndQuestionExam(String email, String examTitle,int point){
         SQLiteDatabase db = this.getReadableDatabase();
-        db.rawQuery("Insert into User_Result values((Select User_id from User where User_Email=?), ?,?)",
+        db.execSQL("Insert into User_Result (User_id,User_Exam_Title_Foreign,User_Total_Points) values((Select User_id from User where User_Email=?), ?,?)",
                 new String[]{email, examTitle, String.valueOf(point)});
+        db.close();
     }
 }

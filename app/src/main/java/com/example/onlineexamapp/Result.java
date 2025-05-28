@@ -3,11 +3,14 @@ package com.example.onlineexamapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -20,7 +23,7 @@ public class Result extends AppCompatActivity {
 
     private ArrayList<Question> data;
     private String quizTitle;
-    private String points;
+    private int quizpoint;
 
 
     @Override
@@ -29,7 +32,7 @@ public class Result extends AppCompatActivity {
         setContentView(R.layout.activity_result);
 
         quizTitle = getIntent().getStringExtra("Quiz Title");
-        points = getIntent().getStringExtra("Quiz points");
+        quizpoint = getIntent().getIntExtra("Quiz points",0);
         data = (ArrayList<Question>)getIntent().getSerializableExtra("Data");
 
         TextView title = findViewById(R.id.title);
@@ -37,27 +40,37 @@ public class Result extends AppCompatActivity {
         ListView listview = findViewById(R.id.listview);
         TextView total = findViewById(R.id.total);
         TextView pointsView = findViewById(R.id.points);
+        Button homebtn = findViewById(R.id.homebtn);
 
         int totalAnswerChecked = (int)data.stream().filter(question -> question.getSelectedAnswer()!=0).count();
         total.setText("Total " + totalAnswerChecked + "/" + data.size());
-        pointsView.setText("Points: " + points);
+        pointsView.setText("Points: " + quizpoint);
+
+        ListAdapter listAdapter = new ListAdapter(data);
+        listview.setAdapter(listAdapter);
+
+        homebtn.setOnClickListener(v->{
+            Intent i =new Intent(Result.this, Home.class);
+            startActivity(i);
+            finish();
+        });
     }
 
     public class ListAdapter extends BaseAdapter {
-        Question[] arr;
+        ArrayList<Question> arr;
 
-        ListAdapter(Question[] arr2) {
+        ListAdapter(ArrayList<Question> arr2) {
             arr = arr2;
         }
 
         @Override
         public int getCount() {
-            return arr.length;
+            return arr.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return arr[i];
+            return arr.get(i);
         }
 
         @Override

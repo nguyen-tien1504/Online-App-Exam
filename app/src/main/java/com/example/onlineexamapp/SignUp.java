@@ -1,6 +1,8 @@
 package com.example.onlineexamapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -16,7 +18,15 @@ import models.UserDatabaseHelper;
 import models.User;
 
 public class SignUp extends AppCompatActivity {
+    // creating constant keys for shared preferences.
+    public static final String SHARED_PREFS = "shared_prefs";
 
+    public static final String EMAIL_KEY = "email_key";
+    public static final String FIRSTNAME_KEY = "firstname_key";
+    public static final String LASTNAME_KEY = "lastname_key";
+    // variable for shared preferences.
+    SharedPreferences sharedpreferences;
+    String emailShare, firstNameShare, lastNameShare;
     @Override
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +42,15 @@ public class SignUp extends AppCompatActivity {
         Button btn_create = findViewById(R.id.btn_create);
         TextView btn_already = findViewById(R.id.btn_already);
         TextView err_message = findViewById(R.id.err_message);
+
+        // initializing our shared preferences.
+        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        emailShare = sharedpreferences.getString(EMAIL_KEY, null);
+        firstNameShare = sharedpreferences.getString(FIRSTNAME_KEY, null);
+        lastNameShare = sharedpreferences.getString(LASTNAME_KEY, null);
 
         btn_already.setOnClickListener(view->{
             Intent i = new Intent(SignUp.this, MainActivity.class);
@@ -58,6 +77,16 @@ public class SignUp extends AppCompatActivity {
                 return;
             }
             db.addUser(new User(firstName.getText().toString(),lastName.getText().toString(),email.getText().toString(),password.getText().toString()));
+
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+
+            editor.putString(EMAIL_KEY, email.getText().toString());
+            editor.putString(FIRSTNAME_KEY, firstName.getText().toString());
+            editor.putString(LASTNAME_KEY, lastName.getText().toString());
+
+            // to save our data with key and value.
+            editor.apply();
+
             Intent myIntent = new Intent(SignUp.this, Home.class);
             startActivity(myIntent);
             finish();

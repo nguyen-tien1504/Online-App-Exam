@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -52,10 +53,9 @@ public class Home extends AppCompatActivity {
         name.setText(firstNameShare + " " + lastNameShare);
         TextView total_questions = findViewById(R.id.total_questions);
         //total_questions.setText(userTotalPointsAndQuestions.getTotalPoints());
-
         TextView total_points = findViewById(R.id.total_points);
-        total_points.setText(userTotalPoints);
-
+        total_points.setText(String.valueOf(userTotalPoints));
+        Log.i("HOme","Msg"+String.valueOf(userTotalPoints));
         Button startQuiz = findViewById(R.id.startQuiz);
         Button createQuiz = findViewById(R.id.createQuiz);
         RelativeLayout solvedQuizzes = findViewById(R.id.solvedQuizzes);

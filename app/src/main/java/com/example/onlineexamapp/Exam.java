@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,16 +26,15 @@ import models.UserDatabaseHelper;
 
 public class Exam extends AppCompatActivity {
     public static final String SHARED_PREFS = "shared_prefs";
-
     public static final String EMAIL_KEY = "email_key";
     SharedPreferences sharedpreferences;
     String emailShare;
     private ArrayList<Question> data;
-    private String quizTitle;
-//    private int oldTotalPoints = 0;
-//    private int oldTotalQuestions = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_exam);
         sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
         // getting data from shared prefs and
@@ -43,15 +43,15 @@ public class Exam extends AppCompatActivity {
         ExamDatabaseHelper examDB = new ExamDatabaseHelper(this);
         UserDatabaseHelper userDB = new UserDatabaseHelper(this);
 
-        super.onCreate(savedInstanceState);
-        quizTitle = getIntent().getStringExtra("Quiz Title");
+        String quizTitle = getIntent().getStringExtra("Quiz Title");
         ListView listview = findViewById(R.id.listview);
         Button submit = findViewById(R.id.submit);
         TextView title = findViewById(R.id.title);
-        setContentView(R.layout.activity_exam);
         title.setText(quizTitle);
 
         data = examDB.getQuestionFromExamTitle(quizTitle);
+        ListAdapter listAdapter = new ListAdapter(data);
+        listview.setAdapter(listAdapter);
         submit.setOnClickListener(v->{
             int points = (int) data.stream().filter(question -> question.getSelectedAnswer() == question.getCorrectAnswer()).count();
             Intent i = new Intent(Exam.this, Result.class);
@@ -66,18 +66,18 @@ public class Exam extends AppCompatActivity {
     }
 
     public class ListAdapter extends BaseAdapter{
-        Question[] arr;
-        ListAdapter (Question[] arr2){
+        ArrayList<Question> arr;
+        ListAdapter (ArrayList<Question> arr2){
             arr = arr2;
         }
         @Override
         public int getCount() {
-            return arr.length;
+            return arr.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return arr[position];
+            return arr.get(position);
         }
 
         @Override

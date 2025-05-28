@@ -6,7 +6,6 @@
     android:background="@drawable/grey_background"
     android:gravity="center"
     android:orientation="vertical"
-    android:layout_marginTop="30dp"
     >
     <TextView
         android:id="@+id/question"

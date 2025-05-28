@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ExamDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLite";
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "Online Exam App";
+    private static final String DATABASE_NAME = "Exam.db";
 
     // Table name: Quizzes.
     private static final String TABLE_QUIZZES= "Quizzes";
@@ -106,13 +106,13 @@ public class ExamDatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Question> getQuestionFromExamTitle(String examTitle){
         SQLiteDatabase db = this.getReadableDatabase();
         int examId = getIdExamOnTitle(examTitle);
-        Cursor cursor = db.rawQuery("Select * from Quizzes where COLUMN_EXAM_ID_FOREIGN = ?",
+        Cursor cursor = db.rawQuery("Select * from Quizzes where Exam_id = ?",
                 new String[]{String.valueOf(examId)});
         ArrayList<Question> dataList = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 // Extract data from the current row
-                String question = cursor.getString(2);
+                String question = cursor.getString(1);
                 String option1 = cursor.getString(3);
                 String option2 = cursor.getString(4);
                 String option3 = cursor.getString(5);
