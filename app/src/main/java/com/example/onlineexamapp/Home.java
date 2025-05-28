@@ -46,15 +46,15 @@ public class Home extends AppCompatActivity {
         firstNameShare = sharedpreferences.getString(FIRSTNAME_KEY, null);
         lastNameShare = sharedpreferences.getString(LASTNAME_KEY, null);
 
-        User userTotalPointsAndQuestions = userDB.getTotalQuestionsAndPointsFromEmail(emailShare);
+        int userTotalPoints = userDB.getTotalQuestionsAndPointsFromEmail(emailShare);
 
         TextView name = findViewById(R.id.name);
         name.setText(firstNameShare + " " + lastNameShare);
         TextView total_questions = findViewById(R.id.total_questions);
-        total_questions.setText(userTotalPointsAndQuestions.getTotalPoints());
+        //total_questions.setText(userTotalPointsAndQuestions.getTotalPoints());
 
         TextView total_points = findViewById(R.id.total_points);
-        total_points.setText(userTotalPointsAndQuestions.getTotalPoints());
+        total_points.setText(userTotalPoints);
 
         Button startQuiz = findViewById(R.id.startQuiz);
         Button createQuiz = findViewById(R.id.createQuiz);

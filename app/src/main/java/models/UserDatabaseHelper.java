@@ -23,25 +23,35 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_USER_LASTNAME = "User_Lastname";
     private static final String COLUMN_USER_EMAIL = "User_Email";
     private static final String COLUMN_USER_PASSWORD = "User_Password";
-    private static final String COLUMN_USER_TOTAL_QUESTIONS = "User_Total_Questions";
-    private static final String COLUMN_USER_TOTAL_POINTS = "User_Total_Points";
 
 
+    //Table name: User_Result
+    private static final String TABLE_USER_RESULT = "User_Result";
+    private static final String COLUMN_USER_RESULT_ID = "User_Result_id";
+    private static final String COLUMN_USER_ID_FOREIGN = "User_id";
+
+    private static final String COLUMN_USER_EXAM_TITLE_FOREIGN = "User_Exam_Title_Foreign";
+    private static final String COLUMN_USER_EXAM_POINT = "User_Total_Points";
     public UserDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String script = "CREATE TABLE " + TABLE_USER + "("
+        String userScript = "CREATE TABLE " + TABLE_USER + "("
                 + COLUMN_USER_ID +" INTEGER PRIMARY KEY,"
                 + COLUMN_USER_FIRSTNAME + " TEXT,"
                 + COLUMN_USER_LASTNAME + " TEXT,"
                 + COLUMN_USER_EMAIL + " TEXT,"
-                + COLUMN_USER_PASSWORD + " TEXT,"
-                + COLUMN_USER_TOTAL_QUESTIONS + " INTEGER DEFAULT 0,"
-                + COLUMN_USER_TOTAL_POINTS + " INTEGER DEFAULT 0" +")";
-        db.execSQL(script);
+                + COLUMN_USER_PASSWORD + " TEXT" +")";
+
+        String userResultScript = "CREATE TABLE " + TABLE_USER_RESULT + "("
+                + COLUMN_USER_RESULT_ID +" INTEGER PRIMARY KEY,"
+                + COLUMN_USER_ID_FOREIGN +" INTEGER,"
+                + COLUMN_USER_EXAM_TITLE_FOREIGN + " TEXT,"
+                + COLUMN_USER_EXAM_POINT + " INTEGER" +")";
+        db.execSQL(userScript);
+        db.execSQL(userResultScript);
     }
 
     @Override
@@ -102,19 +112,19 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         return findUser;
     }
 
-    public User getTotalQuestionsAndPointsFromEmail(String email){
+    public int getTotalQuestionsAndPointsFromEmail(String email){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Select User_Total_Questions, User_Total_Points from User where User_Email=?",
+        Cursor cursor = db.rawQuery("Select SUM(User_Total_Points) from User_Result where User_id= (Select User_id from User where User_Email=?)",
                 new String[]{email});
         cursor.moveToFirst();
-        User userFind = new User(cursor.getInt(0),cursor.getInt(1));
+        int userTotalPoints = cursor.getInt(0);
         cursor.close();
-        return userFind;
+        return userTotalPoints;
     }
 
-    public void updateUserTotalPointsAndQuestions(String email, int points, int questions){
+    public void addUserPointAndQuestionExam(String email, String examTitle,int point){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Update User Set User_Total_Questions = User_Total_Questions +?, User_Total_Points = User_Total_Points +? where email =?",
-                new String[]{String.valueOf(questions), String.valueOf(points),email});
+        db.rawQuery("Insert into User_Result values((Select User_id from User where User_Email=?), ?,?)",
+                new String[]{email, examTitle, String.valueOf(point)});
     }
 }

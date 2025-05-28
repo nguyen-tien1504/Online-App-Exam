@@ -1,6 +1,8 @@
 package com.example.onlineexamapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,15 +21,28 @@ import java.util.ArrayList;
 
 import models.ExamDatabaseHelper;
 import models.Question;
+import models.UserDatabaseHelper;
 
 public class Exam extends AppCompatActivity {
+    public static final String SHARED_PREFS = "shared_prefs";
+
+    public static final String EMAIL_KEY = "email_key";
+    SharedPreferences sharedpreferences;
+    String emailShare;
     private ArrayList<Question> data;
     private String quizTitle;
 //    private int oldTotalPoints = 0;
 //    private int oldTotalQuestions = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
+        // getting data from shared prefs and
+        // storing it in our string variable.
+        emailShare = sharedpreferences.getString(EMAIL_KEY, null);
         ExamDatabaseHelper examDB = new ExamDatabaseHelper(this);
+        UserDatabaseHelper userDB = new UserDatabaseHelper(this);
+
         super.onCreate(savedInstanceState);
         quizTitle = getIntent().getStringExtra("Quiz Title");
         ListView listview = findViewById(R.id.listview);
@@ -40,10 +55,11 @@ public class Exam extends AppCompatActivity {
         submit.setOnClickListener(v->{
             int points = (int) data.stream().filter(question -> question.getSelectedAnswer() == question.getCorrectAnswer()).count();
             Intent i = new Intent(Exam.this, Result.class);
-            Bundle bundle = new Bundle();
+//            Bundle bundle = new Bundle();
+            userDB.addUserPointAndQuestionExam(emailShare, quizTitle, points);
             i.putExtra("Quiz Title", quizTitle);
             i.putExtra("Quiz points", points);
-            i.putExtra("Data",(Serializable) data);
+            i.putExtra("Data", data);
             startActivity(i);
             finish();
         });
