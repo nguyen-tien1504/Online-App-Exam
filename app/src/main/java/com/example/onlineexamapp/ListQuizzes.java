@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,14 +21,22 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class ListQuizzes extends AppCompatActivity {
+import models.ExamDatabaseHelper;
+import models.UserDatabaseHelper;
+import models.UserQuizzResult;
 
+public class ListQuizzes extends AppCompatActivity {
+    public static final String SHARED_PREFS = "shared_prefs";
+
+    public static final String EMAIL_KEY = "email_key";
+    SharedPreferences sharedpreferences;
+    String emailShare;
     private String oper;
     private boolean showGrade;
     private boolean solvedQuizzes;
     private boolean createdQuizzes;
     private boolean quizGrades;
-    private ArrayList<String> ids;
+//    private ArrayList<String> ids;
     private ArrayList<String> grades;
     private String quizID;
 
@@ -36,16 +45,21 @@ public class ListQuizzes extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_quizzes);
 
+        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        emailShare = sharedpreferences.getString(EMAIL_KEY, null);
+
+        UserDatabaseHelper userDB = new UserDatabaseHelper(this);
         oper = getIntent().getStringExtra("Operation");
         TextView title = findViewById(R.id.title);
         ListView listview = findViewById(R.id.listview);
-        ids = new ArrayList<>();
+//        ids = new ArrayList<>();
         grades = new ArrayList<>();
-        ArrayList<String> data = new ArrayList<>();
+        ArrayList<UserQuizzResult> data = new ArrayList<UserQuizzResult>();
 
         if (oper.equals("List Solved Quizzes")) {
-            showGrade = false;
+            showGrade = true;
             solvedQuizzes = true;
+            data = userDB.getUserExamResult(emailShare);
         } else if (oper.equals("List Created Quizzes")) {
             showGrade = false;
             createdQuizzes = true;
@@ -67,9 +81,9 @@ public class ListQuizzes extends AppCompatActivity {
     }
 
     public class ListAdapter extends BaseAdapter {
-        ArrayList<String> arr;
+        ArrayList<UserQuizzResult> arr;
 
-        ListAdapter(ArrayList<String> arr2) {
+        ListAdapter(ArrayList<UserQuizzResult> arr2) {
             arr = arr2;
         }
 
@@ -98,10 +112,11 @@ public class ListQuizzes extends AppCompatActivity {
             TextView quiz = v.findViewById(R.id.quiz);
             RelativeLayout item = v.findViewById(R.id.item);
 
-            quiz.setText(arr.get(i));
+            quiz.setText(arr.get(i).getExam_title());
 
             if (showGrade) {
                 grade.setVisibility(View.VISIBLE);
+                grade.setText(arr.get(i).getUser_Total_Point() + "/" + arr.get(i).getExam_Total_Questions());
             } else {
                 grade.setVisibility(View.GONE);
             }
@@ -109,23 +124,23 @@ public class ListQuizzes extends AppCompatActivity {
             if (solvedQuizzes) {
                 item.setOnClickListener(view1 -> {
                     Intent intent = new Intent(ListQuizzes.this, Result.class);
-                    intent.putExtra("Quiz ID", ids.get(i));
+//                    intent.putExtra("Quiz ID", ids.get(i));
                     startActivity(intent);
                 });
             } else if (createdQuizzes) {
                 item.setOnClickListener(view1 -> {
                     Intent intent = new Intent(ListQuizzes.this, ListQuizzes.class);
                     intent.putExtra("Operation", "List Quiz Grades");
-                    intent.putExtra("Quiz ID", ids.get(i));
-                    intent.putExtra("Quiz Title", arr.get(i));
+//                    intent.putExtra("Quiz ID", ids.get(i));
+                    intent.putExtra("Quiz Title", arr.get(i).getExam_title());
                     startActivity(intent);
                 });
             } else if (quizGrades) {
                 grade.setText(grades.get(i));
                 item.setOnClickListener(view1 -> {
                     Intent intent = new Intent(ListQuizzes.this, Result.class);
-                    intent.putExtra("Quiz ID", quizID);
-                    intent.putExtra("User UID", ids.get(i));
+//                    intent.putExtra("Quiz ID", quizID);
+                    intent.putExtra("User email", emailShare);
                     startActivity(intent);
                 });
             }

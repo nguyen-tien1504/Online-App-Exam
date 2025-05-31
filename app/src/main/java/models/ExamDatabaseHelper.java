@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ExamDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLite";
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "Exam.db";
+    private static final String DATABASE_NAME = "Exam";
 
     // Table name: Quizzes.
     private static final String TABLE_QUIZZES= "Quizzes";

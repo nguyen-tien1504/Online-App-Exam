@@ -9,12 +9,13 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.ArrayList;
 import java.util.Base64;
 
 public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLite";
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "User.db";
+    private static final String DATABASE_NAME = "User";
 
     // Table name: User.
     private static final String TABLE_USER = "User";
@@ -126,5 +127,21 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("Insert into User_Result (User_id,User_Exam_Title_Foreign,User_Total_Points) values((Select User_id from User where User_Email=?), ?,?)",
                 new String[]{email, examTitle, String.valueOf(point)});
         db.close();
+    }
+
+    public ArrayList<UserQuizzResult> getUserExamResult(String email){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("ATTACH DATABASE '/data/data/com.example.onlineexamapp/databases/Exam' as Exam;" );
+        Cursor cursor = db.rawQuery(
+                        "Select Exam_id,Exam_title,User_Total_Points,Exam_total_quetions from User_Result JOIN Exam on Exam_title = User_Exam_Title_Foreign where User_id =(Select User_id from User where User_Email=?)",
+                new String[]{email});
+        if (cursor.moveToFirst()){
+            ArrayList<UserQuizzResult> data = new ArrayList<>();
+            do {
+                data.add(new UserQuizzResult(cursor.getInt(0),cursor.getString(1),cursor.getString(2),cursor.getString(3)));
+            }while (cursor.moveToNext());
+            return data;
+        }
+        return new ArrayList<>();
     }
 }
