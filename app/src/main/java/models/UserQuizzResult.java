@@ -17,10 +17,6 @@ public class UserQuizzResult{
         return Exam_id;
     }
 
-    public void setExam_id(int exam_id) {
-        Exam_id = exam_id;
-    }
-
     public String getExam_title() {
         return Exam_title;
     }
