@@ -17,7 +17,6 @@ public class ExamDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_QUIZZES= "Quizzes";
     private static final String COLUMN_QUESTION_ID = "Question_id";
     private static final String COLUMN_EXAM_ID_FOREIGN = "Exam_id";
-
     private static final String COLUMN_QUESTION = "Question";
     private static final String COLUMN_OPTION_1= "Option_1";
     private static final String COLUMN_OPTION_2 = "Option_2";
@@ -112,6 +111,7 @@ public class ExamDatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 // Extract data from the current row
+                int question_id = cursor.getInt(0);
                 String question = cursor.getString(1);
                 String option1 = cursor.getString(3);
                 String option2 = cursor.getString(4);
@@ -120,7 +120,7 @@ public class ExamDatabaseHelper extends SQLiteOpenHelper {
                 int ans = Integer.parseInt(cursor.getString(7));
 
                 // Create a new object and add it to the list
-                Question item = new Question(question,option1,option2,option3,option4,ans);
+                Question item = new Question(question_id,question,option1,option2,option3,option4,ans);
                 dataList.add(item);
             } while (cursor.moveToNext());
         }

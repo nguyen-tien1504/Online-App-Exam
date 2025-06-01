@@ -124,7 +124,9 @@ public class ListQuizzes extends AppCompatActivity {
             if (solvedQuizzes) {
                 item.setOnClickListener(view1 -> {
                     Intent intent = new Intent(ListQuizzes.this, Result.class);
-//                    intent.putExtra("Quiz ID", ids.get(i));
+                    intent.putExtra("Operation","Reslut Detail");
+                    intent.putExtra("User email",emailShare);
+                    intent.putExtra("Quiz Title",arr.get(i).getExam_title());
                     startActivity(intent);
                 });
             } else if (createdQuizzes) {

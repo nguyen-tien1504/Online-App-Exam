@@ -56,9 +56,13 @@ public class Exam extends AppCompatActivity {
             int points = (int) data.stream().filter(question -> question.getSelectedAnswer() == question.getCorrectAnswer()).count();
             Intent i = new Intent(Exam.this, Result.class);
 //            Bundle bundle = new Bundle();
-            userDB.addUserPointAndQuestionExam(emailShare, quizTitle, points);
+            int userResultid = userDB.addUserPointAndQuestionExam(emailShare, quizTitle, points);
+            ArrayList<Question> userResultDetail = new ArrayList<>();
+            data.forEach(q -> userResultDetail.add(new Question(q.getQuestionId(),q.getSelectedAnswer())));
+            userDB.addUserResultDetail(userResultid, userResultDetail);
             i.putExtra("Quiz Title", quizTitle);
             i.putExtra("Quiz points", points);
+            i.putExtra("Operation", "Exam Result");
             i.putExtra("Data", data);
             startActivity(i);
             finish();

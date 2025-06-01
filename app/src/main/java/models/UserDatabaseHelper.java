@@ -30,9 +30,16 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_USER_RESULT = "User_Result";
     private static final String COLUMN_USER_RESULT_ID = "User_Result_id";
     private static final String COLUMN_USER_ID_FOREIGN = "User_id";
-
     private static final String COLUMN_USER_EXAM_TITLE_FOREIGN = "User_Exam_Title_Foreign";
     private static final String COLUMN_USER_EXAM_POINT = "User_Total_Points";
+
+
+    //Table name: User_Result_Detail
+    private static final String TABLE_USER_RESULT_DETAIL = "User_Result_Detail";
+    private static final String COLUMN_USER_RESULT_DETAIL_ID = "User_Result_Detail_id";
+    private static final String COLUMN_USER_RESULT_ID_FOREIGN = "User_Result_id";
+    private static final String COLUMN_QUESTION_ID = "Question_id";
+    private static final String COLUMN_USER_ANS= "User_ans";
     public UserDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -50,8 +57,16 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_USER_ID_FOREIGN +" INTEGER,"
                 + COLUMN_USER_EXAM_TITLE_FOREIGN + " TEXT,"
                 + COLUMN_USER_EXAM_POINT + " INTEGER" +")";
+
+        String userResultDetailScript = "CREATE TABLE " + TABLE_USER_RESULT_DETAIL + "("
+                + COLUMN_USER_RESULT_DETAIL_ID +" INTEGER PRIMARY KEY,"
+                + COLUMN_USER_RESULT_ID_FOREIGN +" INTEGER,"
+                + COLUMN_QUESTION_ID + " INTEGER,"
+                + COLUMN_USER_ANS + " INTEGER" +")";
+
         db.execSQL(userScript);
         db.execSQL(userResultScript);
+        db.execSQL(userResultDetailScript);
     }
 
     @Override
@@ -122,11 +137,17 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         return userTotalPoints;
     }
 
-    public void addUserPointAndQuestionExam(String email, String examTitle,int point){
+    public int addUserPointAndQuestionExam(String email, String examTitle,int point){
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("Insert into User_Result (User_id,User_Exam_Title_Foreign,User_Total_Points) values((Select User_id from User where User_Email=?), ?,?)",
                 new String[]{email, examTitle, String.valueOf(point)});
+        Cursor cursor = db.rawQuery("Select User_Result_id from User_Result where User_id = (Select User_id from User where User_Email=?) and User_Exam_Title_Foreign=?",
+                new String[]{email, examTitle});
+        cursor.moveToFirst();
+        int User_Result_id = cursor.getInt(0);
+        cursor.close();
         db.close();
+        return User_Result_id;
     }
 
     public ArrayList<UserQuizzResult> getUserExamResult(String email){
@@ -143,5 +164,34 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
             return data;
         }
         return new ArrayList<>();
+    }
+
+    public void addUserResultDetail(int userResultId, ArrayList<Question> data){
+        SQLiteDatabase db = this.getWritableDatabase();
+        data.forEach(question -> {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_USER_RESULT_ID_FOREIGN, userResultId);
+            values.put(COLUMN_QUESTION_ID, question.getQuestionId());
+            values.put(COLUMN_USER_ANS, question.getSelectedAnswer());
+
+            db.insert(TABLE_USER_RESULT_DETAIL,null,values);
+        });
+        db.close();
+    }
+
+    public ArrayList<Question> getUserRedultDetailt(String userEmail, String examTitle){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("ATTACH DATABASE '/data/data/com.example.onlineexamapp/databases/Exam' as Exam;" );
+        Cursor cursor = db.rawQuery("select Question,Option_1,Option_2,Option_3,Option_4,Ans,User_ans from User_Result as UR " +
+                "join User_Result_Detail as URD on UR.User_Result_id == URD.User_Result_id " +
+                "join Exam.Quizzes as EQ on URD.Question_id == EQ.Question_id " +
+                "where User_id = (Select User_id from User WHERE User_Email =?) and User_Exam_Title_Foreign =?",new String[]{userEmail, examTitle});
+        ArrayList<Question> result = new ArrayList<Question>();
+        cursor.moveToFirst();
+        do {
+            result.add(new Question(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),
+                    cursor.getInt(5),cursor.getInt(6)));
+        }while (cursor.moveToNext());
+        return result;
     }
 }

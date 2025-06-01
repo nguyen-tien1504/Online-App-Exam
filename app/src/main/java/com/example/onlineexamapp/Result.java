@@ -18,22 +18,25 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import models.Question;
+import models.UserDatabaseHelper;
 
 public class Result extends AppCompatActivity {
 
     private ArrayList<Question> data;
     private String quizTitle;
     private int quizpoint;
-
+    private String oper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
+
         quizTitle = getIntent().getStringExtra("Quiz Title");
         quizpoint = getIntent().getIntExtra("Quiz points",0);
-        data = (ArrayList<Question>)getIntent().getSerializableExtra("Data");
+        oper = getIntent().getStringExtra("Operation");
+
 
         TextView title = findViewById(R.id.title);
         title.setText(quizTitle);
@@ -41,6 +44,14 @@ public class Result extends AppCompatActivity {
         TextView total = findViewById(R.id.total);
         TextView pointsView = findViewById(R.id.points);
         Button homebtn = findViewById(R.id.homebtn);
+
+        if(oper.equals("Exam Result")){
+            data = (ArrayList<Question>)getIntent().getSerializableExtra("Data");
+        } else if (oper.equals("Reslut Detail")) {
+            UserDatabaseHelper userDb = new UserDatabaseHelper(this);
+            String userEmail = getIntent().getStringExtra("User email");
+            data = userDb.getUserRedultDetailt(userEmail,quizTitle);
+        }
 
         int totalAnswerChecked = (int)data.stream().filter(question -> question.getSelectedAnswer()!=0).count();
         total.setText("Total " + totalAnswerChecked + "/" + data.size());
