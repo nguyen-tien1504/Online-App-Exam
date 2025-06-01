@@ -163,6 +163,7 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
             }while (cursor.moveToNext());
             return data;
         }
+        cursor.close();
         return new ArrayList<>();
     }
 
@@ -192,6 +193,7 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
             result.add(new Question(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),
                     cursor.getInt(5),cursor.getInt(6)));
         }while (cursor.moveToNext());
+        cursor.close();
         return result;
     }
 }
