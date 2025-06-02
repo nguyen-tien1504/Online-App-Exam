@@ -80,6 +80,7 @@ public class Home extends AppCompatActivity {
             }
             Intent i = new Intent(Home.this, ExamEditor.class);
             i.putExtra("Quiz Title", quiz_title.getText().toString());
+            i.putExtra("User Email",emailShare);
             quiz_title.setText("");
             startActivity(i);
         });

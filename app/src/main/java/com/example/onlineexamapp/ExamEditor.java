@@ -30,6 +30,7 @@ import java.util.Collections;
 
 import models.ExamDatabaseHelper;
 import models.Question;
+import models.UserDatabaseHelper;
 
 public class ExamEditor extends AppCompatActivity {
     private static ArrayList<Question> data;
@@ -37,11 +38,13 @@ public class ExamEditor extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ExamDatabaseHelper examDB = new ExamDatabaseHelper(this);
+        UserDatabaseHelper userDB = new UserDatabaseHelper(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exam_editor);
 
         Bundle b = getIntent().getExtras();
         String quizTitle = b.getString("Quiz Title");
+        String userEmail = b.getString("User Email");
 
         TextView title = findViewById(R.id.title);
         title.setText(quizTitle);
@@ -67,6 +70,7 @@ public class ExamEditor extends AppCompatActivity {
                 examDB.addQuestion(questionInsert,examId);
             });
 
+            userDB.addUserCreateExam(userEmail,examId);
 //            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 //            ClipData clip = ClipData.newPlainText("Quiz ID", String.valueOf(quizID));
 //            clipboard.setPrimaryClip(clip);

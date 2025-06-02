@@ -6,8 +6,6 @@ public class User {
     private String LastName;
     private String Email;
     private String Password;
-    private int TotalQuestions;
-    private int TotalPoints;
     public User(String email) {
         Email = email;
     }
@@ -18,28 +16,6 @@ public class User {
         Email = email;
         Password = password;
     }
-
-    public int getTotalQuestions() {
-        return TotalQuestions;
-    }
-
-    public void setTotalQuestions(int totalQuestions) {
-        TotalQuestions = totalQuestions;
-    }
-
-    public int getTotalPoints() {
-        return TotalPoints;
-    }
-
-    public void setTotalPoints(int totalPoints) {
-        TotalPoints = totalPoints;
-    }
-
-    public User(int totalQuestions, int totalPoints) {
-        TotalQuestions = totalQuestions;
-        TotalPoints = totalPoints;
-    }
-
     public User(String firstName, String lastName, int id, String email) {
         Id = id;
         FirstName = firstName;

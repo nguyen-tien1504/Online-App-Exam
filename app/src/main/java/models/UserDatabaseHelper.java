@@ -25,7 +25,6 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_USER_EMAIL = "User_Email";
     private static final String COLUMN_USER_PASSWORD = "User_Password";
 
-
     //Table name: User_Result
     private static final String TABLE_USER_RESULT = "User_Result";
     private static final String COLUMN_USER_RESULT_ID = "User_Result_id";
@@ -40,6 +39,12 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_USER_RESULT_ID_FOREIGN = "User_Result_id";
     private static final String COLUMN_QUESTION_ID = "Question_id";
     private static final String COLUMN_USER_ANS= "User_ans";
+
+    // Table name: User_Create_Exam.
+    private static final String TABLE_USER_CREATE_EXAM = "User_Create_Exam";
+    private static final String COLUMN_USER_CREATE_EXAM_ID = "User_Create_Exam_id";
+    private static final String COLUMN_USER_EMAIL_2= "User_Email";
+    private static final String COLUMN_EXAM_ID = "Exam_id";
     public UserDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -64,9 +69,15 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_QUESTION_ID + " INTEGER,"
                 + COLUMN_USER_ANS + " INTEGER" +")";
 
+        String userCreateExamScript = "CREATE TABLE " + TABLE_USER_CREATE_EXAM + "("
+                + COLUMN_USER_CREATE_EXAM_ID +" INTEGER PRIMARY KEY,"
+                + COLUMN_USER_EMAIL_2+ " TEXT,"
+                + COLUMN_EXAM_ID + " INTEGER" +")";
+
         db.execSQL(userScript);
         db.execSQL(userResultScript);
         db.execSQL(userResultDetailScript);
+        db.execSQL(userCreateExamScript);
     }
 
     @Override
@@ -159,7 +170,7 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()){
             ArrayList<UserQuizzResult> data = new ArrayList<>();
             do {
-                data.add(new UserQuizzResult(cursor.getInt(0),cursor.getString(1),cursor.getString(2),cursor.getString(3)));
+                data.add(new UserQuizzResult(cursor.getInt(0),cursor.getString(1),cursor.getInt(2),cursor.getInt(3)));
             }while (cursor.moveToNext());
             return data;
         }
@@ -195,5 +206,30 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         }while (cursor.moveToNext());
         cursor.close();
         return result;
+    }
+
+    public void addUserCreateExam(String userEmail, int examId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_EMAIL_2, userEmail);
+        values.put(COLUMN_EXAM_ID, examId);
+        db.insert(TABLE_USER_CREATE_EXAM,null,values);
+        db.close();
+    }
+
+    public ArrayList<UserQuizzResult> getUserCreateExam(String userEmail){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("ATTACH DATABASE '/data/data/com.example.onlineexamapp/databases/Exam' as Exam;" );
+        Cursor cursor = db.rawQuery("select Exam_title,Exam_total_quetions from User_Create_Exam UCE " +
+                "JOIN Exam.Exam as E on UCE.Exam_id == E.Exam_id where User_Email=?", new String[]{userEmail});
+        ArrayList<UserQuizzResult> results = new ArrayList<>();
+        cursor.moveToFirst();
+        do {
+            results.add(new UserQuizzResult(cursor.getString(0),cursor.getInt(1)));
+        }while (cursor.moveToNext());
+
+        cursor.close();
+        db.close();
+        return results;
     }
 }

@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import models.ExamDatabaseHelper;
 import models.Question;
 import models.UserDatabaseHelper;
 
@@ -32,11 +33,9 @@ public class Result extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
 
-
         quizTitle = getIntent().getStringExtra("Quiz Title");
         quizpoint = getIntent().getIntExtra("Quiz points",0);
         oper = getIntent().getStringExtra("Operation");
-
 
         TextView title = findViewById(R.id.title);
         title.setText(quizTitle);
@@ -51,11 +50,18 @@ public class Result extends AppCompatActivity {
             UserDatabaseHelper userDb = new UserDatabaseHelper(this);
             String userEmail = getIntent().getStringExtra("User email");
             data = userDb.getUserRedultDetailt(userEmail,quizTitle);
+        } else if (oper.equals("Exam Detail")) {
+            ExamDatabaseHelper examDB = new ExamDatabaseHelper(this);
+            data = examDB.getQuestionFromExamTitle(quizTitle);
+            total.setVisibility(View.GONE);
+            pointsView.setVisibility(View.GONE);
         }
 
-        int totalAnswerChecked = (int)data.stream().filter(question -> question.getSelectedAnswer()!=0).count();
-        total.setText("Total " + totalAnswerChecked + "/" + data.size());
-        pointsView.setText("Points: " + quizpoint);
+        if(oper.equals("Exam Result") || oper.equals("Reslut Detail")){
+            int totalAnswerChecked = (int)data.stream().filter(question -> question.getSelectedAnswer()!=0).count();
+            total.setText("Total " + totalAnswerChecked + "/" + data.size());
+            pointsView.setText("Points: " + quizpoint);
+        }
 
         ListAdapter listAdapter = new ListAdapter(data);
         listview.setAdapter(listAdapter);
@@ -107,6 +113,24 @@ public class Result extends AppCompatActivity {
             option2.setText(data.get(i).getOption2());
             option3.setText(data.get(i).getOption3());
             option4.setText(data.get(i).getOption4());
+
+            if (oper.equals("Exam Detail")){
+                switch (data.get(i).getCorrectAnswer()) {
+                    case 1:
+                        option1.setBackgroundResource(R.drawable.green_background);
+                        break;
+                    case 2:
+                        option2.setBackgroundResource(R.drawable.green_background);
+                        break;
+                    case 3:
+                        option3.setBackgroundResource(R.drawable.green_background);
+                        break;
+                    case 4:
+                        option4.setBackgroundResource(R.drawable.green_background);
+                        break;
+                }
+                return v;
+            }
 
             switch (data.get(i).getSelectedAnswer()) {
                 case 1:
